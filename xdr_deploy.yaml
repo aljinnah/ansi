@@ -1,0 +1,39 @@
+#working  
+# This playbook copy installation files, make required directory and install XDR agent
+
+- hosts: others
+  #remote_user: root
+
+  tasks:
+  - name: Ensure directory /etc/panw exists
+    ansible.builtin.file:
+      path: /etc/panw
+      state: directory
+      owner: root
+      group: root
+      mode: 0644
+  - name: copy cortex.conf to /etc/panw/
+    ansible.builtin.copy:
+      src: files/cortex.conf
+      dest: /etc/panw/
+      owner: root
+      group: root
+      mode: '0644'
+  - name: copy xdr package file to /tmp/
+    ansible.builtin.copy:
+      src: files/cortex-8.4.1.125963.rpm
+      dest: /tmp/
+      owner: root
+      group: root
+      mode: '0644'
+  - name: Ensure selinux-policy-devel package is installed
+    ansible.builtin.package:
+      name: selinux-policy-devel
+      state: present
+  
+  - name: Run the xdr installer
+    ansible.builtin.command: "yum -y install /tmp/cortex-8.4.1.125963.rpm"
+    args:
+      warn: false  
+
+
