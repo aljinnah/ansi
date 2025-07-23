@@ -1,0 +1,27 @@
+#working  
+# This playbook copy installation files, and install halcyon agent on Linux
+
+- hosts: others
+  #remote_user: root
+
+  tasks:
+  - name: copy required Guardicore agent files to /tmp/
+    ansible.builtin.copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      mode: "{{ item.mode }}"
+    loop:
+      - { src: 'files/pub.key', dest: '/tmp/', mode: '0644' } 
+      - { src: 'files/gc-guest-agent-x86_64.rpm', dest: '/tmp/', mode: '0644' }  	
+  - name: Run the Guardicore agent installer script
+    ansible.builtin.shell: |
+      export IS_OFFLINE_PACKAGE=true
+      export SSL_SERVER="10.7.10.41"
+      export GC_PROFILE='test'
+      rpm --import pub.key && rm -f pub.key
+      rpm -i ./gc-guest-agent-x86_64.rpm
+    args:
+      chdir: /tmp/
+      warn: false 
+
+
