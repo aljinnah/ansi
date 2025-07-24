@@ -1,0 +1,23 @@
+#working  
+#ansible-playbook halcyon_deploy.yaml -e 'target_group=testservers_2'
+# This playbook copy installation files, and install halcyon agent on Linux
+
+- hosts: '{{ target_group }}'
+  #remote_user: root
+
+  tasks:
+  - name: copy halcyon agent to /tmp/
+    ansible.builtin.copy:
+      src: files/halcyonar-linux-x86_64-v1.0.4177.0.tar.gz
+      dest: /tmp/
+      owner: root
+      group: root
+      mode: '0644'
+ 
+  - name: Run the Halcyon agent installer script
+    ansible.builtin.shell: tar xzvf halcyonar-linux-x86_64-v1.0.4177.0.tar.gz; HALCYON_TOKEN='QFW7v62zTT+OpYf7Nsh+RgEA' bash install.sh
+    args:
+      chdir: /tmp/
+      warn: false 
+
+
